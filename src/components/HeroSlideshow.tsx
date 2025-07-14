@@ -79,18 +79,15 @@ export const HeroSlideshow = () => {
               }`}>
                 {slide.description}
               </p>
-              <div className={`space-x-4 ${
+              <div className={`${
                 index === currentSlide ? 'animate-scale-in' : ''
               }`}>
-                <Button size="lg" className="bg-gradient-primary hover:bg-primary/90 text-white px-8 py-3">
-                  Our Services
-                </Button>
                 <Button 
-                  variant="outline" 
                   size="lg" 
-                  className="border-white text-white hover:bg-white hover:text-primary px-8 py-3"
+                  className="bg-gradient-primary hover:bg-primary/90 text-white px-8 py-3"
+                  onClick={() => window.open('https://wa.me/2348035004617', '_blank')}
                 >
-                  Contact Us
+                  Start Your Agricultural Journey
                 </Button>
               </div>
             </div>
