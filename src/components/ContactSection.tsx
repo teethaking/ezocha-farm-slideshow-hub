@@ -69,7 +69,7 @@ export const ContactSection = () => {
                     className="w-full bg-accent hover:bg-accent/90 text-white"
                     onClick={() => window.open('https://wa.me/2348035004617', '_blank')}
                   >
-                    Start Your Agricultural Journey
+                    Contact Us
                   </Button>
                 </div>
               </div>
