@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Leaf, ShoppingCart, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import heroFarming from '@/assets/hero-farming.jpg';
 import heroProduce from '@/assets/hero-produce.jpg';
 import heroTechnology from '@/assets/hero-technology.jpg';
@@ -31,6 +32,7 @@ const slides = [
 
 export const HeroSlideshow = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -51,7 +53,7 @@ export const HeroSlideshow = () => {
     <div className="relative h-screen overflow-hidden">
       {/* Header with Logo */}
       <header className="absolute top-0 left-0 right-0 z-30 p-6">
-        <div className="flex items-center justify-center md:justify-start">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 text-white">
             <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full">
               <Leaf size={24} className="text-white" />
@@ -59,6 +61,27 @@ export const HeroSlideshow = () => {
             <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
               Ezocha Farms
             </h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              onClick={() => navigate('/shop')}
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Shop
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              onClick={() => navigate('/auth')}
+            >
+              <User className="h-4 w-4 mr-2" />
+              Account
+            </Button>
           </div>
         </div>
       </header>
@@ -92,15 +115,24 @@ export const HeroSlideshow = () => {
               }`}>
                 {slide.description}
               </p>
-              <div className={`${
+              <div className={`flex flex-col sm:flex-row gap-4 justify-center ${
                 index === currentSlide ? 'animate-scale-in' : ''
               }`}>
                 <Button 
                   size="lg" 
                   className="bg-gradient-primary hover:bg-primary/90 text-white px-8 py-3"
+                  onClick={() => navigate('/shop')}
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Shop Fresh Produce
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 px-8 py-3"
                   onClick={() => window.open('https://wa.me/2348035004617', '_blank')}
                 >
-                  Start Your Agricultural Journey
+                  Contact Us
                 </Button>
               </div>
             </div>
