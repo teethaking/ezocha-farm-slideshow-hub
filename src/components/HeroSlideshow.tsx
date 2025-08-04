@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
 import heroFarming from '@/assets/hero-farming.jpg';
 import heroProduce from '@/assets/hero-produce.jpg';
 import heroTechnology from '@/assets/hero-technology.jpg';
@@ -49,6 +49,19 @@ export const HeroSlideshow = () => {
 
   return (
     <div className="relative h-screen overflow-hidden">
+      {/* Header with Logo */}
+      <header className="absolute top-0 left-0 right-0 z-30 p-6">
+        <div className="flex items-center justify-center md:justify-start">
+          <div className="flex items-center gap-3 text-white">
+            <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full">
+              <Leaf size={24} className="text-white" />
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-wide">
+              Ezocha Farms
+            </h1>
+          </div>
+        </div>
+      </header>
       {slides.map((slide, index) => (
         <div
           key={slide.id}
