@@ -4,109 +4,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Leaf, ShoppingCart, Search, LogOut, User, Plus, Minus } from "lucide-react";
+import { Leaf, ShoppingCart, Search, LogOut, User, Plus, Minus, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import cucumberSeeds from "@/assets/cucumber-seeds.jpg";
+import pepperSeeds from "@/assets/pepper-seeds.jpg";
+import tomatoSeeds from "@/assets/tomato-seeds.jpg";
+import lettuceSpinach from "@/assets/lettuce-spinach.jpg";
+import carrots from "@/assets/carrots.jpg";
 
 interface Product {
   id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
+  category_id: string;
   image_url: string;
   stock: number;
   unit: string;
+  categories?: { name: string };
 }
 
-// Sample product data - in a real app, this would come from your database
-const sampleProducts: Product[] = [
-  {
-    id: "1",
-    name: "Organic Tomatoes",
-    description: "Fresh, juicy organic tomatoes grown with care",
-    price: 4.99,
-    category: "vegetables",
-    image_url: "/api/placeholder/300/200",
-    stock: 50,
-    unit: "lb"
-  },
-  {
-    id: "2",
-    name: "Free-Range Eggs",
-    description: "Farm-fresh eggs from happy, free-range chickens",
-    price: 6.99,
-    category: "dairy",
-    image_url: "/api/placeholder/300/200",
-    stock: 30,
-    unit: "dozen"
-  },
-  {
-    id: "3",
-    name: "Fresh Spinach",
-    description: "Nutrient-rich organic spinach leaves",
-    price: 3.49,
-    category: "vegetables",
-    image_url: "/api/placeholder/300/200",
-    stock: 25,
-    unit: "bunch"
-  },
-  {
-    id: "4",
-    name: "Raw Honey",
-    description: "Pure, unprocessed honey from our own beehives",
-    price: 12.99,
-    category: "pantry",
-    image_url: "/api/placeholder/300/200",
-    stock: 15,
-    unit: "jar"
-  },
-  {
-    id: "5",
-    name: "Organic Carrots",
-    description: "Sweet, crunchy carrots perfect for snacking",
-    price: 2.99,
-    category: "vegetables",
-    image_url: "/api/placeholder/300/200",
-    stock: 40,
-    unit: "lb"
-  },
-  {
-    id: "6",
-    name: "Fresh Basil",
-    description: "Aromatic basil perfect for cooking",
-    price: 2.49,
-    category: "herbs",
-    image_url: "/api/placeholder/300/200",
-    stock: 20,
-    unit: "bunch"
-  }
-];
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const imageMap: { [key: string]: string } = {
+  '/src/assets/cucumber-seeds.jpg': cucumberSeeds,
+  '/src/assets/pepper-seeds.jpg': pepperSeeds,
+  '/src/assets/tomato-seeds.jpg': tomatoSeeds,
+  '/src/assets/lettuce-spinach.jpg': lettuceSpinach,
+  '/src/assets/carrots.jpg': carrots,
+};
 
 const Shop = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [products] = useState<Product[]>(sampleProducts);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(sampleProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState<{[key: string]: number}>({});
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication status
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
-    };
-
     checkAuth();
+    fetchData();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+    setUser(session.user);
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -118,7 +76,44 @@ const Shop = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  };
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from("categories")
+        .select("*");
+      
+      if (categoriesError) throw categoriesError;
+      setCategories(categoriesData || []);
+
+      // Fetch products with categories
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `);
+      
+      if (productsError) throw productsError;
+      setProducts(productsData || []);
+      setFilteredProducts(productsData || []);
+      
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Filter products based on search and category
@@ -132,7 +127,7 @@ const Shop = () => {
     }
 
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      filtered = filtered.filter(product => product.category_id === selectedCategory);
     }
 
     setFilteredProducts(filtered);
@@ -188,9 +183,15 @@ const Shop = () => {
     }, 0);
   };
 
-  const categories = ["all", "vegetables", "fruits", "dairy", "herbs", "pantry"];
+  const formatNaira = (amount: number) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
 
-  if (!user) {
+  if (!user || isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -219,6 +220,11 @@ const Shop = () => {
                 <User className="h-5 w-5 text-green-600" />
                 <span className="text-sm font-medium">{user.email}</span>
               </div>
+
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
               
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-2" />
@@ -251,10 +257,10 @@ const Shop = () => {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category === "all" ? "All Categories" : 
-                     category.charAt(0).toUpperCase() + category.slice(1)}
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -266,14 +272,22 @@ const Shop = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-video bg-green-100 flex items-center justify-center">
-                <Leaf className="h-16 w-16 text-green-400" />
+              <div className="aspect-video bg-green-100 flex items-center justify-center overflow-hidden">
+                {product.image_url && imageMap[product.image_url] ? (
+                  <img 
+                    src={imageMap[product.image_url]} 
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Leaf className="h-16 w-16 text-green-400" />
+                )}
               </div>
               
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-lg">{product.name}</CardTitle>
-                  <Badge variant="secondary">{product.category}</Badge>
+                  <Badge variant="secondary">{product.categories?.name || 'Unknown'}</Badge>
                 </div>
                 <CardDescription>{product.description}</CardDescription>
               </CardHeader>
@@ -282,7 +296,7 @@ const Shop = () => {
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <span className="text-2xl font-bold text-green-700">
-                      ${product.price.toFixed(2)}
+                      {formatNaira(product.price)}
                     </span>
                     <span className="text-sm text-muted-foreground ml-1">
                       per {product.unit}
@@ -345,7 +359,7 @@ const Shop = () => {
                     {getTotalItems()} items
                   </span>
                   <span className="text-2xl font-bold text-green-700 ml-4">
-                    ${getTotalPrice().toFixed(2)}
+                    {formatNaira(getTotalPrice())}
                   </span>
                 </div>
                 <Button size="lg">
