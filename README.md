@@ -61,4 +61,4 @@ Text editor (e.g., VS Code) for development
 Git for version control
 
 
-check it out https://preview--ezocha-farm-slideshow-hub.lovable.app/
+check it out https:https://ezochafarms.netlify.app
