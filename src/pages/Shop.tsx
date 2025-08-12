@@ -61,6 +61,14 @@ const Shop = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("ezocha_cart_simple");
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
   useEffect(() => {
     checkAuth();
     fetchData();
@@ -158,10 +166,15 @@ const Shop = () => {
   };
 
   const addToCart = (productId: string) => {
-    setCart(prev => ({
-      ...prev,
-      [productId]: (prev[productId] || 0) + 1
-    }));
+    const newCart = {
+      ...cart,
+      [productId]: (cart[productId] || 0) + 1
+    };
+    setCart(newCart);
+    
+    // Save to localStorage
+    localStorage.setItem("ezocha_cart_simple", JSON.stringify(newCart));
+    
     toast({
       title: "Added to cart",
       description: "Item successfully added to your cart",
@@ -169,15 +182,16 @@ const Shop = () => {
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prev => {
-      const newCart = { ...prev };
-      if (newCart[productId] > 1) {
-        newCart[productId] -= 1;
-      } else {
-        delete newCart[productId];
-      }
-      return newCart;
-    });
+    const newCart = { ...cart };
+    if (newCart[productId] > 1) {
+      newCart[productId] -= 1;
+    } else {
+      delete newCart[productId];
+    }
+    setCart(newCart);
+    
+    // Save to localStorage
+    localStorage.setItem("ezocha_cart_simple", JSON.stringify(newCart));
   };
 
   const getTotalItems = () => {
@@ -190,7 +204,23 @@ const Shop = () => {
       return total + (product ? product.price * quantity : 0);
     }, 0);
   };
-
+  
+  const handleProceedToCheckout = () => {
+    // Create cart data for checkout
+    const cartItems = Object.entries(cart).map(([productId, quantity]) => {
+      const product = products.find(p => p.id === productId);
+      return {
+        product,
+        quantity
+      };
+    }).filter(item => item.product); // Remove any items where product wasn't found
+    
+    // Save cart items to localStorage for checkout page
+    localStorage.setItem("ezocha_cart", JSON.stringify(cartItems));
+    
+    // Navigate to checkout
+    navigate("/checkout");
+  };
   const formatNaira = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -370,7 +400,7 @@ const Shop = () => {
                     {formatNaira(getTotalPrice())}
                   </span>
                 </div>
-                <Button size="lg">
+                <Button size="lg" onClick={handleProceedToCheckout}>
                   Proceed to Checkout
                 </Button>
               </div>
