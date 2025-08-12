@@ -14,6 +14,10 @@ import pepperSeeds from "@/assets/pepper-seeds.jpg";
 import tomatoSeeds from "@/assets/tomato-seeds.jpg";
 import lettuceSpinach from "@/assets/lettuce-spinach.jpg";
 import carrots from "@/assets/carrots.jpg";
+import yamTuber from "@/assets/yam-tuber.jpg";
+import palmOil from "@/assets/palm-oil.jpg";
+import watermelon from "@/assets/watermelon.jpg";
+import plantainSuccers from "@/assets/plantain-suckers.jpg";
 
 interface Product {
   id: string;
@@ -39,6 +43,10 @@ const imageMap: { [key: string]: string } = {
   '/src/assets/tomato-seeds.jpg': tomatoSeeds,
   '/src/assets/lettuce-spinach.jpg': lettuceSpinach,
   '/src/assets/carrots.jpg': carrots,
+  '/src/assets/yam-tuber.jpg': yamTuber,
+  '/src/assets/palm-oil.jpg': palmOil,
+  '/src/assets/watermelon.jpg': watermelon,
+  '/src/assets/plantain-suckers.jpg': plantainSuccers,
 };
 
 const Shop = () => {
