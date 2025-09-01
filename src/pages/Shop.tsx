@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Leaf, ShoppingCart, Search, LogOut, User, Plus, Minus, Settings } from "lucide-react";
+import { Leaf, ShoppingCart, Search, LogOut, User, Plus, Minus, Settings, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -242,6 +242,24 @@ const Shop = () => {
             <div className="flex items-center gap-2">
               <Leaf className="h-8 w-8 text-green-600" />
               <h1 className="text-2xl font-bold text-green-800">Ezocha Farms</h1>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex items-center gap-6">
+              <Button variant="ghost" onClick={() => navigate("/")} className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Home
+              </Button>
+              
+              <Button variant="ghost" className="flex items-center gap-2 bg-green-100 text-green-700">
+                <ShoppingCart className="h-4 w-4" />
+                Shop
+              </Button>
+              
+              <Button variant="ghost" onClick={() => navigate("/auth")} className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Login
+              </Button>
             </div>
             
             <div className="flex items-center gap-4">
