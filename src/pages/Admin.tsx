@@ -34,6 +34,7 @@ interface Category {
 
 const Admin = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +65,37 @@ const Admin = () => {
       navigate("/auth");
       return;
     }
+    
+    // Check if user has admin role
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      toast({
+        title: "Access Error",
+        description: "Unable to verify admin access. Please try again.",
+        variant: "destructive",
+      });
+      navigate("/shop");
+      return;
+    }
+
+    if (profile?.role !== "admin") {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin access to this page.",
+        variant: "destructive",
+      });
+      navigate("/shop");
+      return;
+    }
+
     setUser(session.user);
+    setIsAdmin(true);
   };
 
   const fetchData = async () => {
@@ -225,8 +256,17 @@ const Admin = () => {
     }).format(amount);
   };
 
-  if (!user || isLoading) {
-    return <div>Loading...</div>;
+  if (!user || isLoading || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">
+            {isLoading ? "Loading admin panel..." : "Checking admin access..."}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

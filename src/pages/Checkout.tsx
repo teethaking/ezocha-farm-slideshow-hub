@@ -65,9 +65,18 @@ const Checkout = () => {
     if (storedCart) {
       const cart = JSON.parse(storedCart);
       setCartItems(cart);
-    }
-
-    if (cartItems.length === 0) {
+      
+      // Check if cart is empty after loading
+      if (cart.length === 0) {
+        toast({
+          title: "Empty Cart",
+          description: "Your cart is empty. Please add items before checkout.",
+          variant: "destructive",
+        });
+        navigate("/shop");
+      }
+    } else {
+      // No cart in localStorage
       toast({
         title: "Empty Cart",
         description: "Your cart is empty. Please add items before checkout.",
