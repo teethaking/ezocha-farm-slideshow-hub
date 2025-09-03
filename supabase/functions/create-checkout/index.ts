@@ -38,10 +38,35 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const { items, customerInfo } = await req.json();
-    logStep("Request data received", { itemsCount: items.length, customerInfo });
+    logStep("Request data received", { itemsCount: items.length, customerName: customerInfo.firstName });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
+    });
+
+    // SECURITY FIX: Fetch product prices from database instead of trusting client
+    const productIds = items.map((item: any) => item.id);
+    const { data: products, error: productsError } = await supabaseClient
+      .from("products")
+      .select("id, name, price, description")
+      .in("id", productIds);
+    
+    if (productsError) throw new Error(`Failed to fetch products: ${productsError.message}`);
+    if (!products || products.length === 0) throw new Error("No valid products found");
+    
+    logStep("Products fetched from database", { productCount: products.length });
+
+    // Validate all requested products exist and calculate secure total
+    const validatedItems = items.map((item: any) => {
+      const product = products.find(p => p.id === item.id);
+      if (!product) throw new Error(`Product not found: ${item.id}`);
+      
+      return {
+        ...item,
+        name: product.name,
+        description: product.description,
+        price: product.price, // Use database price, not client price
+      };
     });
 
     // Check if customer exists
@@ -67,24 +92,24 @@ serve(async (req) => {
       logStep("New customer created", { customerId });
     }
 
-    // Calculate total amount in kobo (Nigerian cents)
-    const totalAmount = items.reduce((total: number, item: any) => {
+    // Calculate total amount using DATABASE prices (security fix)
+    const totalAmount = validatedItems.reduce((total: number, item: any) => {
       return total + (item.price * item.quantity * 100); // Convert to kobo
     }, 0);
 
-    logStep("Total calculated", { totalAmount, currency: 'NGN' });
+    logStep("Total calculated securely", { totalAmount, currency: 'NGN' });
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session using validated items with database prices
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      line_items: items.map((item: any) => ({
+      line_items: validatedItems.map((item: any) => ({
         price_data: {
           currency: "ngn",
           product_data: {
             name: item.name,
             description: item.description,
           },
-          unit_amount: item.price * 100, // Convert to kobo
+          unit_amount: item.price * 100, // Convert to kobo (now using secure DB price)
         },
         quantity: item.quantity,
       })),
@@ -114,12 +139,12 @@ serve(async (req) => {
     if (orderError) throw orderError;
     logStep("Order created in database", { orderId: order.id });
 
-    // Create order items
-    const orderItems = items.map((item: any) => ({
+    // Create order items using validated prices
+    const orderItems = validatedItems.map((item: any) => ({
       order_id: order.id,
       product_id: item.id,
       quantity: item.quantity,
-      price: item.price,
+      price: item.price, // Now using database price
     }));
 
     const { error: itemsError } = await supabaseClient

@@ -8,7 +8,14 @@ const corsHeaders = {
 };
 
 const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  // Reduced PII logging - only log essential non-sensitive details
+  const safeDetails = details ? {
+    ...details,
+    // Remove potentially sensitive fields
+    email: details.email ? '[REDACTED]' : undefined,
+    sessionId: details.sessionId ? details.sessionId.substring(0, 8) + '...' : undefined,
+  } : {};
+  const detailsStr = Object.keys(safeDetails).length > 0 ? ` - ${JSON.stringify(safeDetails)}` : '';
   console.log(`[VERIFY-PAYMENT] ${step}${detailsStr}`);
 };
 
@@ -20,11 +27,24 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // SECURITY FIX: Now requires authentication since JWT verification is enabled
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
+
+    // Verify the user is authenticated
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    const user = userData.user;
+    if (!user) throw new Error("User not authenticated");
+
+    logStep("User authenticated", { userId: user.id });
 
     const { sessionId } = await req.json();
     logStep("Session ID received", { sessionId });

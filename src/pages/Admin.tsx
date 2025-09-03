@@ -66,15 +66,16 @@ const Admin = () => {
       return;
     }
     
-    // Check if user has admin role
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+    // Check if user has admin role using new user_roles table
+    const { data: userRoles, error: roleError } = await supabase
+      .from("user_roles")
       .select("role")
       .eq("user_id", session.user.id)
-      .single();
+      .eq("role", "admin")
+      .maybeSingle();
 
-    if (profileError) {
-      console.error("Error fetching profile:", profileError);
+    if (roleError) {
+      console.error("Error fetching user role:", roleError);
       toast({
         title: "Access Error",
         description: "Unable to verify admin access. Please try again.",
@@ -84,7 +85,7 @@ const Admin = () => {
       return;
     }
 
-    if (profile?.role !== "admin") {
+    if (!userRoles || userRoles.role !== "admin") {
       toast({
         title: "Access Denied",
         description: "You don't have admin access to this page.",
