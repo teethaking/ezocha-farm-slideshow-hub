@@ -238,7 +238,15 @@ export type Database = {
           user_id?: string
           zip_code?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_management_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -259,13 +267,39 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_management_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      user_management_view: {
+        Row: {
+          display_name: string | null
+          email: string | null
+          email_confirmed_at: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          last_sign_in_at: string | null
+          role: string | null
+          signed_up_at: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      add_admin_role: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
