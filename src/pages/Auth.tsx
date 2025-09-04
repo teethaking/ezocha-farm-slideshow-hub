@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -131,6 +132,31 @@ const Auth = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleMakeMeAdmin = async () => {
+    setIsAdminLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('make_me_admin');
+      
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: data || "You are now an admin!",
+      });
+      
+      // Navigate to admin panel after becoming admin
+      navigate("/admin");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsAdminLoading(false);
     }
   };
 
@@ -298,6 +324,31 @@ const Auth = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Admin Setup Button */}
+        <div className="mt-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">First Time Setup</h3>
+                  <p className="text-xs text-muted-foreground">
+                    If no admin exists yet, you can make yourself an admin
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleMakeMeAdmin} 
+                  disabled={isAdminLoading}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  {isAdminLoading ? "Setting up..." : "Make Me Admin"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
