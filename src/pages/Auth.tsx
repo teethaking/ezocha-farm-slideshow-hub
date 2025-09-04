@@ -82,7 +82,7 @@ const Auth = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -96,6 +96,28 @@ const Auth = () => {
       });
 
       if (error) throw error;
+
+      // If signup was successful, also update the profile with email for admin visibility
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            user_id: data.user.id,
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+            display_name: `${firstName} ${lastName}`,
+            phone: phone || null,
+            address: address || null,
+          }, {
+            onConflict: 'user_id'
+          });
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+          // Don't show error to user as the main signup succeeded
+        }
+      }
 
       toast({
         title: "Success",
