@@ -21,15 +21,15 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/shop");
-      }
+    // Clear any existing session for fresh start
+    const clearSession = async () => {
+      await supabase.auth.signOut();
+      // Clear any stored data
+      localStorage.clear();
+      sessionStorage.clear();
     };
-    checkAuth();
-  }, [navigate]);
+    clearSession();
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
