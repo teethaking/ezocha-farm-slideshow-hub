@@ -56,3 +56,6 @@ verify_jwt = true
 
 [functions.verify-payment]
 verify_jwt = true
+
+[functions.farm-bot]
+verify_jwt = false

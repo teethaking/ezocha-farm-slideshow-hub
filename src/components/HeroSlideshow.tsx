@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Leaf, ShoppingCart, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Leaf, ShoppingCart, User, Bot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import heroFarming from '@/assets/hero-farming.jpg';
 import heroProduce from '@/assets/hero-produce.jpg';
@@ -64,6 +64,15 @@ export const HeroSlideshow = () => {
           </div>
           
           <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              onClick={() => navigate('/farm-bot')}
+            >
+              <Bot className="h-4 w-4 mr-2" />
+              Farm Bot
+            </Button>
             <Button
               variant="outline"
               size="sm"
