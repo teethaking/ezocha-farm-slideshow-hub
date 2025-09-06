@@ -68,15 +68,6 @@ export const HeroSlideshow = () => {
               variant="outline"
               size="sm"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              onClick={() => navigate('/farm-bot')}
-            >
-              <Bot className="h-4 w-4 mr-2" />
-              Farm Bot
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
               onClick={() => navigate('/shop')}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />

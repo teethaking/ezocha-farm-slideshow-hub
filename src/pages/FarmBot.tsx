@@ -114,31 +114,33 @@ const FarmBot = () => {
           </Card>
         </div>
 
-        <Card className="h-[600px] flex flex-col">
-          <CardContent className="flex-1 p-4">
+        <Card className="flex flex-col" style={{ height: 'calc(100vh - 200px)' }}>
+          <CardContent className="flex-1 p-4 overflow-hidden">
             <ScrollArea ref={scrollAreaRef} className="h-full pr-4">
-              <div className="space-y-4">
+              <div className="space-y-4 pb-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex items-start gap-2 max-w-[80%]`}>
+                    <div className={`flex items-start gap-2 max-w-[85%]`}>
                       {message.sender === 'bot' && (
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-1">
                           <Bot className="h-4 w-4 text-green-600" />
                         </div>
                       )}
                       
                       <div
-                        className={`rounded-lg px-4 py-2 ${
+                        className={`rounded-2xl px-4 py-3 max-w-full break-words ${
                           message.sender === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                            : 'bg-gray-100 border border-gray-200'
                         }`}
                       >
-                        <p className="whitespace-pre-wrap">{message.content}</p>
-                        <span className="text-xs opacity-70 mt-1 block">
+                        <p className="whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
+                        <span className={`text-xs mt-2 block ${
+                          message.sender === 'user' ? 'text-green-100' : 'text-gray-500'
+                        }`}>
                           {message.timestamp.toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit'
@@ -147,8 +149,8 @@ const FarmBot = () => {
                       </div>
                       
                       {message.sender === 'user' && (
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <User className="h-4 w-4 text-primary" />
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-1">
+                          <User className="h-4 w-4 text-green-600" />
                         </div>
                       )}
                     </div>
@@ -158,14 +160,14 @@ const FarmBot = () => {
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="flex items-start gap-2">
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1">
                         <Bot className="h-4 w-4 text-green-600" />
                       </div>
-                      <div className="bg-muted rounded-lg px-4 py-2">
+                      <div className="bg-gray-100 border border-gray-200 rounded-2xl px-4 py-3">
                         <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                       </div>
                     </div>
@@ -175,20 +177,20 @@ const FarmBot = () => {
             </ScrollArea>
           </CardContent>
           
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
+          <div className="p-4 border-t bg-gray-50/50">
+            <div className="flex gap-3">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me about farming, crops, soil management..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 rounded-full border-gray-300 focus:border-green-500 focus:ring-green-500"
               />
               <Button
                 onClick={sendMessage}
                 disabled={!input.trim() || isLoading}
-                size="icon"
+                className="rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 px-6"
               >
                 <Send className="h-4 w-4" />
               </Button>
