@@ -18,6 +18,7 @@ import yamTuber from "@/assets/yam-tuber.jpg";
 import palmOil from "@/assets/palm-oil.jpg";
 import watermelon from "@/assets/watermelon.jpg";
 import plantainSuccers from "@/assets/plantain-suckers.jpg";
+import { FloatingFarmBot } from "@/components/FloatingFarmBot";
 
 interface Product {
   id: string;
@@ -426,6 +427,7 @@ const Shop = () => {
           </Card>
         )}
       </div>
+      <FloatingFarmBot />
     </div>
   );
 };
