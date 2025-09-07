@@ -4,7 +4,7 @@ import { ServicesSection } from '@/components/ServicesSection';
 import { PartnersSection } from '@/components/PartnersSection';
 import { ContactSection } from '@/components/ContactSection';
 import { FloatingFarmBot } from '@/components/FloatingFarmBot';
-import { NewsFeedSection } from '@/components/NewsFeedSection';
+import { NewsFeed } from '@/components/NewsFeed';
 
 const Index = () => {
   return (
@@ -12,7 +12,7 @@ const Index = () => {
       <HeroSlideshow />
       <AboutSection />
       <ServicesSection />
-      <NewsFeedSection />
+      <NewsFeed />
       <PartnersSection />
       <ContactSection />
       <FloatingFarmBot />

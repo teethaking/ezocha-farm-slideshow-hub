@@ -19,7 +19,7 @@ import palmOil from "@/assets/palm-oil.jpg";
 import watermelon from "@/assets/watermelon.jpg";
 import plantainSuccers from "@/assets/plantain-suckers.jpg";
 import { FloatingFarmBot } from "@/components/FloatingFarmBot";
-import { CartSidebar } from "@/components/CartSidebar";
+import { CartSection } from "@/components/CartSection";
 import { EmailConfirmationStatus } from "@/components/EmailConfirmationStatus";
 
 interface Product {
@@ -283,12 +283,14 @@ const Shop = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <CartSidebar 
-                cart={cart}
-                products={products}
-                onUpdateQuantity={updateCartQuantity}
-                onRemoveItem={removeItemCompletely}
-              />
+              <div className="relative">
+                <ShoppingCart className="h-6 w-6 text-green-600" />
+                {getTotalItems() > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {getTotalItems()}
+                  </Badge>
+                )}
+              </div>
               
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-green-600" />
@@ -311,7 +313,7 @@ const Shop = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <EmailConfirmationStatus />
+          <EmailConfirmationStatus user={user} />
           <h2 className="text-3xl font-bold text-green-800 mb-4 mt-6">Fresh Farm Products</h2>
           <p className="text-green-600 mb-6">Discover our selection of fresh, organic produce</p>
           
@@ -421,29 +423,18 @@ const Shop = () => {
           ))}
         </div>
 
-        {/* Cart Summary */}
-        {getTotalItems() > 0 && (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Cart Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-lg font-semibold">
-                    {getTotalItems()} items
-                  </span>
-                  <span className="text-2xl font-bold text-green-700 ml-4">
-                    {formatNaira(getTotalPrice())}
-                  </span>
-                </div>
-                <Button size="lg" onClick={handleProceedToCheckout}>
-                  Proceed to Checkout
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Enhanced Cart Section */}
+        <CartSection 
+          cart={cart}
+          products={products}
+          onUpdateCart={(productId, quantity) => {
+            const newCart = { ...cart, [productId]: quantity };
+            setCart(newCart);
+            localStorage.setItem("ezocha_cart_simple", JSON.stringify(newCart));
+          }}
+          onRemoveFromCart={removeFromCart}
+          onProceedToCheckout={handleProceedToCheckout}
+        />
       </div>
       <FloatingFarmBot />
     </div>

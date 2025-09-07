@@ -146,8 +146,6 @@ const Auth = () => {
           <p className="text-green-600">Fresh farm products delivered to your door</p>
         </div>
 
-        <EmailConfirmationStatus />
-        
         <Card className="mt-4">
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
