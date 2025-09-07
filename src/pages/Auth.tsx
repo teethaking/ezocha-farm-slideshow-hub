@@ -8,6 +8,7 @@ import { Leaf, Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { EmailConfirmationStatus } from "@/components/EmailConfirmationStatus";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -145,7 +146,9 @@ const Auth = () => {
           <p className="text-green-600">Fresh farm products delivered to your door</p>
         </div>
 
-        <Card>
+        <EmailConfirmationStatus />
+        
+        <Card className="mt-4">
           <CardHeader>
             <CardTitle>Welcome</CardTitle>
             <CardDescription>

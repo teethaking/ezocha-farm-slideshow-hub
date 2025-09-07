@@ -19,6 +19,8 @@ import palmOil from "@/assets/palm-oil.jpg";
 import watermelon from "@/assets/watermelon.jpg";
 import plantainSuccers from "@/assets/plantain-suckers.jpg";
 import { FloatingFarmBot } from "@/components/FloatingFarmBot";
+import { CartSidebar } from "@/components/CartSidebar";
+import { EmailConfirmationStatus } from "@/components/EmailConfirmationStatus";
 
 interface Product {
   id: string;
@@ -195,6 +197,23 @@ const Shop = () => {
     localStorage.setItem("ezocha_cart_simple", JSON.stringify(newCart));
   };
 
+  const updateCartQuantity = (productId: string, change: number) => {
+    if (change > 0) {
+      addToCart(productId);
+    } else {
+      removeFromCart(productId);
+    }
+  };
+
+  const removeItemCompletely = (productId: string) => {
+    const newCart = { ...cart };
+    delete newCart[productId];
+    setCart(newCart);
+    
+    // Save to localStorage
+    localStorage.setItem("ezocha_cart_simple", JSON.stringify(newCart));
+  };
+
   const getTotalItems = () => {
     return Object.values(cart).reduce((total, quantity) => total + quantity, 0);
   };
@@ -264,14 +283,12 @@ const Shop = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <ShoppingCart className="h-6 w-6 text-green-600" />
-                {getTotalItems() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                    {getTotalItems()}
-                  </Badge>
-                )}
-              </div>
+              <CartSidebar 
+                cart={cart}
+                products={products}
+                onUpdateQuantity={updateCartQuantity}
+                onRemoveItem={removeItemCompletely}
+              />
               
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-green-600" />
@@ -294,7 +311,8 @@ const Shop = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-green-800 mb-4">Fresh Farm Products</h2>
+          <EmailConfirmationStatus />
+          <h2 className="text-3xl font-bold text-green-800 mb-4 mt-6">Fresh Farm Products</h2>
           <p className="text-green-600 mb-6">Discover our selection of fresh, organic produce</p>
           
           {/* Filters */}
