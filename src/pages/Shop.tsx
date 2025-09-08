@@ -21,6 +21,7 @@ import plantainSuccers from "@/assets/plantain-suckers.jpg";
 import { FloatingFarmBot } from "@/components/FloatingFarmBot";
 import { CartSection } from "@/components/CartSection";
 import { EmailConfirmationStatus } from "@/components/EmailConfirmationStatus";
+import { UserPresence } from "@/components/UserPresence";
 
 interface Product {
   id: string;
@@ -313,7 +314,10 @@ const Shop = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <EmailConfirmationStatus user={user} />
+          <div className="flex items-center justify-between mb-4">
+            <EmailConfirmationStatus user={user} />
+            <UserPresence user={user} />
+          </div>
           <h2 className="text-3xl font-bold text-green-800 mb-4 mt-6">Fresh Farm Products</h2>
           <p className="text-green-600 mb-6">Discover our selection of fresh, organic produce</p>
           

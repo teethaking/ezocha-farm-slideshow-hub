@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, User, Eye, Leaf, TrendingUp, Truck, Cpu, Users, Fish } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { NewsModal } from "./NewsModal";
 
 interface NewsPost {
   id: string;
@@ -45,10 +46,16 @@ export const NewsFeed = () => {
   const [filteredPosts, setFilteredPosts] = useState<NewsPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchPosts();
+    
+    // Auto-refresh news every 5 minutes
+    const interval = setInterval(fetchPosts, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -90,6 +97,13 @@ export const NewsFeed = () => {
     });
   };
 
+  const openNewsModal = async (post: NewsPost) => {
+    // Increment views
+    await incrementViews(post.id);
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
   const incrementViews = async (postId: string) => {
     try {
       // Get current views count first
@@ -110,6 +124,9 @@ export const NewsFeed = () => {
         } else {
           // Update local state to reflect the change
           setPosts(prev => prev.map(post => 
+            post.id === postId ? { ...post, views: post.views + 1 } : post
+          ));
+          setFilteredPosts(prev => prev.map(post => 
             post.id === postId ? { ...post, views: post.views + 1 } : post
           ));
         }
@@ -208,7 +225,7 @@ export const NewsFeed = () => {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => incrementViews(post.id)}
+                        onClick={() => openNewsModal(post)}
                       >
                         Read Full Story
                       </Button>
@@ -269,7 +286,7 @@ export const NewsFeed = () => {
                       variant="outline" 
                       size="sm" 
                       className="w-full"
-                      onClick={() => incrementViews(post.id)}
+                      onClick={() => openNewsModal(post)}
                     >
                       Read More
                     </Button>
@@ -287,6 +304,12 @@ export const NewsFeed = () => {
           )}
         </div>
       </div>
+      
+      <NewsModal 
+        post={selectedPost} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </section>
   );
 };
